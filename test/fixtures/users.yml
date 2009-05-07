@@ -1,5 +1,6 @@
 
 quentin:
+  name:                      Quentin Tarantino
   login:                     quentin
   email:                     quentin@example.com
   salt:                      1b6453892473a467d07372d45eb05abc2031647a # SHA1('0')

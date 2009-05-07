@@ -16,41 +16,25 @@ package spendr.controllers {
     public var currentUser:User;
     public var categories:ModelsCollection;
     public var expenditures:ModelsCollection;
-    private var currencyFormatter:CurrencyFormatter;
     
     public function initialLoadCache():void {
       if (_initialLoadCacheComplete) return;
       _initialLoadCacheComplete = true;
-      setupCurrencyFormatter();
       Rx.models.addEventListener(CacheUpdateEvent.ID, onCacheUpdate);
       Rx.models.index(User);
       Rx.models.index(Category);
       Rx.models.index(Expenditure);
     }
     
-    private function setupCurrencyFormatter():void {
-      currencyFormatter = new CurrencyFormatter;
-      currencyFormatter.precision = 2;
-      currencyFormatter.useThousandsSeparator = true;
-      currencyFormatter.currencySymbol = "$";
-    }
-    
-    public function formattedCents(cents:int):String {
-      return currencyFormatter.format(cents / 100.0);
-    }
-    
     private function sumExpendituresOverCategories():void {
       for (var c:int = 0 ; c < categories.length ; c++) {
         var category:Category = categories[c];
-        /*category.expenditureSum = 0.0;
-        category.expenditureCount = 0;*/
         if (category.expenditures) { // we don't know if we have both categories and expenditures yet, so check
           for (var e:int = 0 ; e < category.expenditures.length; e++)  {
             category.expenditureSum += category.expenditures[e].amount;
           }
           category.expenditureCount = category.expenditures.length;
         }
-        trace(category.name + " expenditures = " + category.expenditureSum);
       }
     }
     
@@ -58,7 +42,6 @@ package spendr.controllers {
     private function onCacheUpdate(event:CacheUpdateEvent):void {
       //trace("SpendrModel#onCacheUpdate: " + event.fqn);
       if (event.isFor(User)) {
-        trace("setting current User to " + Rx.models.cached(User)[0].email)
         currentUser = Rx.models.cached(User)[0];
       } else if (event.isFor(Category)) {
         categories = Rx.models.cached(Category);
